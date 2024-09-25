@@ -1,5 +1,12 @@
+//或许可以用链表来记录操作，然后就可以back了
+//将读入字符串写到读入货物那里应该就可以实现所要求的输入输出（也就是无需输入别的字符来继续摆货之类的）
+//但是受限于目前的程序，不便于修改
+//有些地方设计的也很迷惑，像有的switch语句和那个error的设计感觉都不很好
+//或许再写这个程序的时候没必要用全局变量，或许可以用指针来达到目的
+//但是当时指针并没有熟练掌握所以没能实现，最终还是采用了全局变量的方法
 #include <stdio.h>
 #include <string.h>
+#include <Windows.h>
 
 typedef struct
 {
@@ -18,7 +25,7 @@ void place_the_goods(GOODS goods[6])
 {
     GOODS placement = {.occupy = 1};
     int error = 100;
-    printf("Please enter the type,asile,price,and number in order:");
+    printf("请输入要摆放货物的类型，通道，单价和个数：");
 
     for ( ; error != 4; )
     {
@@ -76,7 +83,7 @@ void place_the_goods(GOODS goods[6])
 
         if (error != 4)
         {
-            printf("Please re-enter these data correctly:");
+            printf("请按指定格式重新输入合理的数据：");
         }
         
     }
@@ -110,7 +117,7 @@ void place_the_goods(GOODS goods[6])
 
 void on_the_shelf(GOODS goods[6])
 {
-    printf("Now on the shelf:\n");
+    printf("货架：\n");
     for ( int i = 1; i < 6; i++)
     {
         printf("%d: ", i);
@@ -131,7 +138,7 @@ void buy_the_goods(GOODS goods[])
 {
     GOODS purchase = {.occupy = 1};
     int error = 100;
-    printf("Please enter the type,asile,and number in order:");
+    printf("请输入你想要购买的货物的类型和通道：");
 
     for ( ; error != 3; )
     {
@@ -157,7 +164,7 @@ void buy_the_goods(GOODS goods[])
 
         if (error != 3)
         {
-            printf("Please re-enter these data correctly:");
+            printf("请按指定格式重新输入合理数据：");
         }
         
     }
@@ -166,6 +173,8 @@ void buy_the_goods(GOODS goods[])
 
 int main(void)
 {   
+    SetConsoleCP(GB2312_CHARSET);
+    SetConsoleOutputCP(GB2312_CHARSET);
     for ( int i = 1; i < 6; i++)
     {
         g[i] = clear;
@@ -178,12 +187,12 @@ int main(void)
         on_the_shelf(g);
         while (getchar() != '\n')
             ;
-        printf("Enter END to quit:");
+        printf("输入END结束摆货，输入其他继续：");
         scanf("%3s", end);
         i = strcmp(end, "END");
     }
     
-    printf("Now you can buy some goods.\n");
+    printf("现在可以开始购买了\n");
 
     for ( ; ; )
     {
@@ -192,35 +201,32 @@ int main(void)
             char end[4];
             buy_the_goods(g);
             on_the_shelf(g);
-            printf("Enter END to stop to check out:");
+            printf("输入END结束选货并结算，输入其他继续：");
             scanf("%3s", end);
             i = strcmp(end, "END");
         }
 
         for ( ; total_price >= 0; )
         {
-            
+            while (getchar() != '\n')
+                ;
             int coin;
-            printf("Please insert coins here:");
-            for ( int error = 0; error != 0 ; )
+            printf("请投币");
+            scanf("%d", &coin);
+            switch (coin)
             {
-                scanf("%d", &coin);
-                switch (coin)
-                {
-                case 1: case 2: case 3:
-                    error = 1;
-                    total_price -= coin;
-                    break;
+            case 1: case 2: case 5:
+                total_price -= coin;
+                break;
             
-                default:
-                    printf("Please insert coins of 1,2 or 5:");
-                    break;
+            default:
+                printf("请投入一元，两元或五元硬币：");
+                break;
             }
             
-            }
         }
 
-        printf("Here is the change:%d\n", -total_price);
+        printf("找零:%d\n", -total_price);
         total_price = 0;
 
     }
